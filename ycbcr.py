@@ -1,6 +1,7 @@
 import image
 import blocks
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 if __name__ == "__main__":
@@ -33,3 +34,65 @@ if __name__ == "__main__":
     that_block_sub_part = that_block_green[:4,:4]
     plt.imshow(that_block_sub_part, cmap=plt.get_cmap('Greens'))
     plt.show()
+
+    # Encoding and decoding foud on stack overflow
+    # Ref : https://stackoverflow.com/a/34913974/5795941
+    # What a numpy boss that guy.
+    def rgb2ycbcr(im):
+        """ Each rgb which is a im[i,j,:] so a vector that goes in the page,
+        That vector gets multiplied by the matrix, M given below, and the result
+        becomes ycbcr[i,j,:] he does the same thing for the other way around
+
+        so this is like doing
+
+        for i,j:
+            rgb = im[i,j,:]
+            ycc = M * rgb + b (multiplication d'un vecteur par une matrice
+            ycbcr_img[i,j,:] = ycc
+
+        et b = [0, 128, 128]."""
+        xform = np.array(
+            [[.299,    .587,   .114],
+             [-.1687, -.3313,  .5],
+             [.5,     -.4187, -.0813]])
+        ycbcr = im.dot(xform.T)
+        ycbcr[:, :, [1, 2]] += 128
+        return np.uint8(ycbcr)
+
+    def ycbcr2rgb(im):
+        xform = np.array([
+            [1, 0, 1.402],
+            [1, -0.34414, -.71414],
+            [1, 1.772, 0]])
+        rgb = im.astype(np.float)
+        rgb[:, :, [1, 2]] -= 128
+        rgb = rgb.dot(xform.T)
+        np.putmask(rgb, rgb > 255, 255)
+        np.putmask(rgb, rgb < 0, 0)
+        return np.uint8(rgb)
+
+    img = image.get_test_image()
+    img = img[:h - h%16, :w-w%16,:]
+    ycbcr_img = rgb2ycbcr(img)
+    img_back = ycbcr2rgb(ycbcr_img)
+
+    plt.imshow(img_back)
+    plt.show()
+
+    YCBCR_IMG = ycbcr_img # juste pour flasher
+
+    Y = YCBCR_IMG[:,:,0]
+    CB = YCBCR_IMG[:,:,1]
+    CR = YCBCR_IMG[:,:,2]
+    Y_subsample = Y[::2,::2]
+
+    plt.imshow(Y_subsample, cmap=plt.get_cmap('gray'))
+    plt.show()
+    plt.imshow(CB, cmap=plt.get_cmap('gray'))
+    plt.show()
+    plt.imshow(CR, cmap=plt.get_cmap('gray'))
+    plt.show()
+
+    Y_subsample_blocks = blocks.split_8x8(Y_subsample)
+    CB_blocks = blocks.split_8x8(CB)
+    CR_blocks = blocks.split_8x8(CR)
