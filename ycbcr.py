@@ -20,8 +20,8 @@ if __name__ == "__main__":
     # Our friendly block (30,40)
     green_8x8_blocks = blocks.split_8x8(green_channel)
     that_block_green = green_8x8_blocks[30,40]
-    plt.imshow(that_block_green, cmap=plt.get_cmap('Greens'))
-    plt.show()
+    # plt.imshow(that_block_green, cmap=plt.get_cmap('Greens'))
+    # plt.show()
 
     ########### THIS IS THE SUBSAMPLING PART
     # NOTE We are not going to subsample the green, we're going to subsample the
@@ -33,8 +33,8 @@ if __name__ == "__main__":
     # to the block above
     that_block_green = green_8x8_blocks[15,20]
     that_block_sub_part = that_block_green[:4,:4]
-    plt.imshow(that_block_sub_part, cmap=plt.get_cmap('Greens'))
-    plt.show()
+    # plt.imshow(that_block_sub_part, cmap=plt.get_cmap('Greens'))
+    # plt.show()
 
     # Encoding and decoding foud on stack overflow
     # Ref : https://stackoverflow.com/a/34913974/5795941
@@ -77,8 +77,8 @@ if __name__ == "__main__":
     ycbcr_img = rgb2ycbcr(img)
     img_back = ycbcr2rgb(ycbcr_img)
 
-    plt.imshow(img_back)
-    plt.show()
+    # plt.imshow(img_back)
+    # plt.show()
 
     YCBCR_IMG = ycbcr_img # juste pour flasher
 
@@ -87,12 +87,12 @@ if __name__ == "__main__":
     CR = YCBCR_IMG[:,:,2]
     Y_subsample = Y[::2,::2]
 
-    plt.imshow(Y_subsample, cmap=plt.get_cmap('gray'))
-    plt.show()
-    plt.imshow(CB, cmap=plt.get_cmap('gray'))
-    plt.show()
-    plt.imshow(CR, cmap=plt.get_cmap('gray'))
-    plt.show()
+    # plt.imshow(Y_subsample, cmap=plt.get_cmap('gray'))
+    # plt.show()
+    # plt.imshow(CB, cmap=plt.get_cmap('gray'))
+    # plt.show()
+    # plt.imshow(CR, cmap=plt.get_cmap('gray'))
+    # plt.show()
 
     Y_subsample_blocks = blocks.split_8x8(Y_subsample)
     CB_blocks = blocks.split_8x8(CB)
@@ -111,14 +111,29 @@ if __name__ == "__main__":
 
     my_block = CB_blocks[30, 40]
 
-    plt.imshow(my_block, cmap=plt.get_cmap('gray'))
-    plt.show()
+    # plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+    # plt.show()
     print(my_block)
 
     encoded_block = mdct.encode_dct(my_block)
-    plt.imshow(my_block, cmap=plt.get_cmap('gray'))
-    plt.show()
+    # plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+    # plt.show()
     print(encoded_block)
 
+    Quant1= np.matrix('16 11 10 16 24 40 51 61;\
+        12 12 14 19 26 58 60 55;\
+        14 13 16 24 40 57 69 56;\
+        14 17 22 29 51 87 80 62;\
+        18 22 37 56 68 109 103 77;\
+        24 35 55 64 81 104 103 92;\
+        49 64 78 77 103 121 120 101;\
+        72 92 95 98 112 100 103 99').astype('float')
 
+    quantified_block = np.round(np.divide(encoded_block, Quant1))
+    print(quantified_block.astype('int8'))
 
+    decoded_block = mdct.decode_dct(quantified_block)
+    plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+    plt.show()
+    plt.imshow(decoded_block, cmap=plt.get_cmap('gray'))
+    plt.show()
