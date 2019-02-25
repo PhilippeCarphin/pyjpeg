@@ -4,15 +4,11 @@ import numpy as np
 
 def split_8x8(img):
     h = img.shape[0]
-    print("h", h)
     w = img.shape[1]
-    print("w", w)
-    print("h/8", h//8)
     rows = np.array(np.split(img, h//8, 0))
     blocks = np.array(
         [np.split(row, w//8, 1) for row in rows]
     )
-    print(blocks.shape)
     return blocks
 
 def open_image_as_8x8_blocks(filename):
