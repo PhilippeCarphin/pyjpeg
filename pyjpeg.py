@@ -1,5 +1,3 @@
-print("pyjpeg")
-
 import numpy as np
 # import scipy.fftpack as dctpack
 from skimage import io
@@ -27,8 +25,8 @@ plt.show()
 
 assert np.array_equal(row_of_blocks[40], a_block), "Should be equal"
 
-# plt.imshow(row_of_blocks[40])
-# plt.show()
+plt.imshow(row_of_blocks[40])
+plt.show()
 
 rows = np.array(np.split(img, 75, i_axis))
 blocks = np.array(
