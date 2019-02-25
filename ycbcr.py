@@ -2,9 +2,6 @@ import image
 import blocks
 import matplotlib.pyplot as plt
 import numpy as np
-import dct_experiment as mdct
-import quantize
-
 
 # Encoding and decoding foud on stack overflow
 # Ref : https://stackoverflow.com/a/34913974/5795941

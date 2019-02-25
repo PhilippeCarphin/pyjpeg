@@ -1,5 +1,5 @@
 import numpy as np
-import dct_experiment as mdct
+import dct
 
 Quant1= np.matrix('16 11 10 16 24 40 51 61;\
         12 12 14 19 26 58 60 55;\
@@ -52,13 +52,13 @@ if __name__ == "__main__":
     plt.title("Un blocCB (le bloc (30,40))")
     plt.show()
 
-    encoded_block = mdct.encode_dct(my_block)
+    encoded_block = dct.encode_dct(my_block)
     print(f"dct block\n{encoded_block}")
     plt.imshow(encoded_block, cmap=plt.get_cmap('gray'))
     plt.title("BlocCB > DCT")
     plt.show()
 
-    CB_blocks_dct = mdct.dct_encode_blocks(CB_blocks)
+    CB_blocks_dct = dct.dct_encode_blocks(CB_blocks)
 
     # Quantizing a whole bunch of blocks with slices
     quantized_blocks = quantize_blocks(CB_blocks_dct)
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     plt.show()
     print(f"quantized dct block\n{quantified_block}")
 
-    decoded_block = mdct.decode_dct(quantified_block)
+    decoded_block = dct.decode_dct(quantified_block)
     plt.imshow(decoded_block, cmap=plt.get_cmap('gray'))
     plt.title("BlocCB > DCT > Quantification > IDCT")
     plt.show()
