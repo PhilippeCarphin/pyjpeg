@@ -3,9 +3,14 @@ import numpy as np
 
 
 def split_8x8(img):
-    rows = np.array(np.split(img, 75, 0))
+    h = img.shape[0]
+    print("h", h)
+    w = img.shape[1]
+    print("w", w)
+    print("h/8", h//8)
+    rows = np.array(np.split(img, h//8, 0))
     blocks = np.array(
-        [np.split(row, 75, 1) for row in rows]
+        [np.split(row, w//8, 1) for row in rows]
     )
     print(blocks.shape)
     return blocks

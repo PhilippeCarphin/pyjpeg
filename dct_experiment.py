@@ -28,6 +28,7 @@ def show_basis_element(i,j):
     return basis
 
 def shift_image_by_128_for_dct(image):
+    return image
     return (image.astype('int16') - 128).astype('int8')
 
 if __name__ == "__main__":
