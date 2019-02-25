@@ -24,3 +24,8 @@ def get_test_image_as_8x8_blocks():
     img = get_test_image()
     return split_8x8(img)
 
+def get_one_test_8x8_rgb_block():
+    return get_test_image_as_8x8_blocks()[30,40,:,:,:]
+
+def get_one_test_8x8_block():
+    return get_one_test_8x8_rgb_block()[:,:,0]

@@ -3,6 +3,7 @@ import blocks
 import numpy as np
 import scipy.fftpack as dctpack
 import matplotlib.pyplot as plt
+import quantize
 
 def encode_dct(block_8x8):
     first_pass_dct = dctpack.dct(block_8x8, axis=0, norm='ortho')
@@ -15,56 +16,79 @@ def decode_dct(dct_block_8x8):
     return idct_block_8x8
 
 def dct_basis_element(i,j):
+    """ Returns the inverse discrete cosine transform of a canonical basis
+    element (i.e. a vector with a '1' in a single position and zeroes everywhere
+    else."""
     block = np.zeros((8,8))
     block[i,j] = 1
     first_pass_idct = dctpack.idct(block, axis=0, norm='ortho')
     idct_block = dctpack.idct(first_pass_idct, axis=1, norm='ortho')
     return idct_block
 
-def show_basis_element(i,j):
-    basis = dct_basis_element(i,j)
-    plt.imshow(basis, cmap = plt.get_cmap('gray'))
-    plt.show()
-    return basis
+def dct_encode_blocks(blocks):
+    # Le astype('float') est ben important ici, sinon les
+    # tests ont l'air de pas marcher
+    n_blocks_h = blocks.shape[0]
+    n_blocks_w = blocks.shape[1]
+    dct_blocks = np.empty_like(blocks).astype('float')
+    for i in range(n_blocks_h):
+        for j in range(n_blocks_w):
+            dct_blocks[i,j,:,:] = encode_dct(blocks[i,j,:,:])
+    return dct_blocks
 
-def shift_image_by_128_for_dct(image):
-    return image
-    return (image.astype('int16') - 128).astype('int8')
 
 if __name__ == "__main__":
     the_blocks = blocks.get_test_image_as_8x8_blocks()
-    the_blocks = shift_image_by_128_for_dct(the_blocks)
     red_blocks, green_blocks, blue_blocks = blocks.split_rgb(the_blocks)
 
-
-    ################### 1 Bloc original
+    ################### Bloc original
     my_block = red_blocks[30,40]
     print("Bloc original\n", my_block)
     plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+    plt.title("Bloc")
     plt.show()
 
-    ################### 2 Bloc encodé
+    ################### Bloc encodé
     encoded_block = encode_dct(my_block)
-    print("Bloc encodé\n", encoded_block)
-    print(encoded_block.dtype)
+    print("Bloc encodé :\n", encoded_block)
     plt.imshow(encoded_block, cmap=plt.get_cmap('gray'))
+    plt.title("Bloc > dct")
     plt.show()
 
-    ################### 3 Combinaison Linéaire avec deux coefficients
+    ################### Bloc DCT Quantifié
+    quantized_block = quantize.quantize_one_block(encoded_block)
+    print("Bloc encodé, quantifié :\n", quantized_block)
+    plt.imshow(quantized_block, cmap=plt.get_cmap('gray'))
+    plt.title("Bloc > dct > quantifié")
+    plt.show()
+
+    ################### Combinaison Linéaire avec deux coefficients
     # On fait une combinaison linéaire avec les coefficients du coin en haut à
     # gauche qui ont l'air les plux forts
-    comb = np.zeros((8,8))
-    b1 = dct_basis_element(0,1)
-    comb += b1 * encoded_block[0,1] / 255
-    b2 = dct_basis_element(1,0)
-    comb += b2 * encoded_block[1,0] / 255
-    plt.imshow(comb, cmap=plt.get_cmap('gray'))
+    comb_lin = np.zeros((8,8))
+    comb_lin += dct_basis_element(0,1) * encoded_block[0,1] / 255
+    comb_lin += dct_basis_element(1,0) * encoded_block[1,0] / 255
+    plt.imshow(comb_lin, cmap=plt.get_cmap('gray'))
+    plt.title("Bloc > dct > quantification AGRESSIVE > idct")
     plt.show()
 
-    ################### 4 Combinaison Linéaire avec 16 coefficients
-    comb = np.zeros((8,8))
+    ################### Combinaison Linéaire avec 16 coefficients
+    comb_lin = np.zeros((8,8))
     for i in range(4):
         for j in range(4):
-            comb += dct_basis_element(i,j) * encoded_block[i,j] / 255
-    plt.imshow(comb, cmap=plt.get_cmap('gray'))
+            comb_lin += dct_basis_element(i,j) * encoded_block[i,j] / 255
+    plt.imshow(comb_lin, cmap=plt.get_cmap('gray'))
+    plt.title("Bloc > dct > quantification moins agressive > idct")
     plt.show()
+
+    idct_block = decode_dct(quantized_block)
+    plt.imshow(idct_block, cmap=plt.get_cmap('gray'))
+    plt.title("Bloc > dct > la vraie quantification > idct")
+    plt.show()
+
+    idct_block = decode_dct(encoded_block)
+    plt.imshow(idct_block, cmap=plt.get_cmap('gray'))
+    plt.title("Bloc > dct > PAS de quantification > idct")
+    plt.show()
+
+

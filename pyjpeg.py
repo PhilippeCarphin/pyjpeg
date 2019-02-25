@@ -3,6 +3,10 @@ import numpy as np
 from skimage import io
 import matplotlib.pyplot as plt
 
+"""
+Toutes des vieilles affaires pas rapport
+"""
+
 img = io.imread('input_image.png')
 height = img.shape[0]
 width = img.shape[1]
