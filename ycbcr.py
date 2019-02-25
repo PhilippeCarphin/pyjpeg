@@ -98,6 +98,9 @@ if __name__ == "__main__":
     CB_blocks = blocks.split_8x8(CB)
     CR_blocks = blocks.split_8x8(CR)
 
+    n_blocks_h = CB_blocks.shape[0]
+    n_blocks_w = CB_blocks.shape[1]
+
     CB_thresh = 3
 
     zz = [[0,  1,  5,  6,  14, 15, 27, 28],
@@ -113,12 +116,12 @@ if __name__ == "__main__":
 
     # plt.imshow(my_block, cmap=plt.get_cmap('gray'))
     # plt.show()
-    print(my_block)
+    # print(my_block)
 
     encoded_block = mdct.encode_dct(my_block)
     # plt.imshow(my_block, cmap=plt.get_cmap('gray'))
     # plt.show()
-    print(encoded_block)
+    # print(encoded_block)
 
     Quant1= np.matrix('16 11 10 16 24 40 51 61;\
         12 12 14 19 26 58 60 55;\
@@ -129,7 +132,36 @@ if __name__ == "__main__":
         49 64 78 77 103 121 120 101;\
         72 92 95 98 112 100 103 99').astype('float')
 
-    quantified_block = np.round(np.divide(encoded_block, Quant1))
+    def quantize_one_block(block):
+        pass
+
+    def quantize_blocks(blocks, quant):
+        """ Takes an array of shape (n_blocks_h, n_blocks_w, 8, 8) and
+        goes through all the blocks to quantize them"""
+        # (n_blocks_h, n_blocks_w, 8,8)
+        qb = np.empty_like(blocks)
+        assert len(blocks.shape) == 4
+        n_blocks_h = blocks.shape[0]
+        n_blocks_w = blocks.shape[1]
+        for i in range(n_blocks_h):
+            for j in range(n_blocks_w):
+                qb[i,j,:,:] = np.round(np.divide(blocks[i,j,:,:], quant))
+        return qb.astype('float')
+
+    # Le astype('float') est ben important ici, sinon les
+    # tests ont l'air de pas marcher
+    CB_blocks_dct = np.empty_like(CB_blocks).astype('float')
+    for i in range(n_blocks_h):
+        for j in range(n_blocks_w):
+            CB_blocks_dct[i,j,:,:] = mdct.encode_dct(CB_blocks[i,j,:,:])
+
+    # Quantizing one block by hand
+    quantified_block = np.round(np.divide(encoded_block[:,:], Quant1))
+    print(quantified_block.astype('int8'))
+
+    # Quantizing a whole bunch of blocks with slices
+    quantized_blocks = quantize_blocks(CB_blocks_dct, Quant1)
+    quantified_block = quantized_blocks[30,40]
     print(quantified_block.astype('int8'))
 
     decoded_block = mdct.decode_dct(quantified_block)
