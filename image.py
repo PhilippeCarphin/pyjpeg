@@ -1,6 +1,8 @@
 from skimage import io
 import matplotlib.pyplot as plt
-
+import numpy as np
+np.set_printoptions(precision=2)
+np.set_printoptions(suppress=True)
 def open_image_as_ndarray(filename):
     img = io.imread(filename)
     return img.astype('float')

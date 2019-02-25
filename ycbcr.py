@@ -2,6 +2,7 @@ import image
 import blocks
 import matplotlib.pyplot as plt
 import numpy as np
+import dct_experiment as mdct
 
 
 if __name__ == "__main__":
@@ -96,3 +97,28 @@ if __name__ == "__main__":
     Y_subsample_blocks = blocks.split_8x8(Y_subsample)
     CB_blocks = blocks.split_8x8(CB)
     CR_blocks = blocks.split_8x8(CR)
+
+    CB_thresh = 3
+
+    zz = [[0,  1,  5,  6,  14, 15, 27, 28],
+          [2,  4,  7,  13, 16, 26, 29, 42],
+          [3,  8,  12, 17, 25, 30, 41, 43],
+          [9,  11, 18, 24, 31, 40, 44, 53],
+          [10, 19, 23, 32, 39, 45, 52, 54],
+          [20, 22, 33, 38, 46, 51, 55, 60],
+          [21, 34, 37, 47, 50, 56, 59, 61],
+          [35, 36, 48, 49, 57, 58, 62, 63]]
+
+    my_block = CB_blocks[30, 40]
+
+    plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+    plt.show()
+    print(my_block)
+
+    encoded_block = mdct.encode_dct(my_block)
+    plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+    plt.show()
+    print(encoded_block)
+
+
+
