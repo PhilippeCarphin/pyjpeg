@@ -1,7 +1,7 @@
 import image
-import blocks
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 # Encoding and decoding foud on stack overflow
 # Ref : https://stackoverflow.com/a/34913974/5795941
@@ -21,12 +21,13 @@ def rgb2ycbcr(im):
     et b = [0, 128, 128].
     """
     xform = np.array(
-        [[.299,    .587,   .114],
-         [-.1687, -.3313,  .5],
-         [.5,     -.4187, -.0813]])
+        [[.299, .587, .114],
+         [-.1687, -.3313, .5],
+         [.5, -.4187, -.0813]])
     ycbcr = im.dot(xform.T)
     ycbcr[:, :, [1, 2]] += 128
     return np.uint8(ycbcr)
+
 
 def ycbcr2rgb(im):
     xform = np.array([
@@ -46,24 +47,25 @@ def get_ycbcr_test_image():
     img = image.get_test_image()
     return rgb2ycbcr(img)
 
+
 if __name__ == "__main__":
-    img = image.get_test_image()
-    plt.imshow(img)
+    test_img = image.get_test_image()
+    plt.imshow(test_img)
     plt.title("Image originale")
     plt.show()
 
-    ycbcr_img = rgb2ycbcr(img)
-    img_back = ycbcr2rgb(ycbcr_img)
-    plt.imshow(abs(img_back.astype('float') - img.astype('float')))
+    ycbcr_img = rgb2ycbcr(test_img)
+    img_back = ycbcr2rgb(ycbcr_img.astype('float'))
+    plt.imshow(img_back)
     plt.title("Image encodée et décodée")
     plt.show()
 
 
-    Y = ycbcr_img[:,:,0]
-    CB = ycbcr_img[:,:,1]
-    CR = ycbcr_img[:,:,2]
+    Y = ycbcr_img[:, :, 0]
+    CB = ycbcr_img[:, :, 1]
+    CR = ycbcr_img[:, :, 2]
 
-    Y_subsample = Y[::2,::2]
+    Y_subsample = Y[::2, ::2]
 
     plt.imshow(Y_subsample, cmap=plt.get_cmap('gray_r'))
     plt.title("Channel Y subsamplé")
