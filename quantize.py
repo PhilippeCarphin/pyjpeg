@@ -11,14 +11,16 @@ Quant1= np.matrix('16 11 10 16 24 40 51 61;\
         72 92 95 98 112 100 103 99').astype('float')
 
 def quantize_one_block(block, quant=Quant1):
+    assert block.shape == quant.shape, f"blocks must have same shape as quant"
     qb = np.empty_like(block)
     qb[:,:] = np.round(np.divide(block[:,:], quant))
     return qb.astype('float')
 
 def quantize_blocks(blocks, quant=Quant1):
-    """ Takes an array of shape (n_blocks_h, n_blocks_w, 8, 8) and
+    assert blocks.shape[2:] == quant.shape, f"blocks must have same shape as quant"
+    """ Takes an array of shape (n_blocks_h, n_blocks_w, N, N) and
     goes through all the blocks to quantize them"""
-    # (n_blocks_h, n_blocks_w, 8,8)
+    # (n_blocks_h, n_blocks_w, N,N)
     qb = np.empty_like(blocks)
     assert len(blocks.shape) == 4
     n_blocks_h = blocks.shape[0]
@@ -34,27 +36,27 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import ycbcr
 
-    my_block = blocks.get_one_test_8x8_block()
+    my_block = blocks.get_one_test_NxN_block()
     print(f"my_block : {my_block}")
 
     quantized_block = quantize_one_block(my_block)
     print(f"quantized_block : {quantized_block}")
 
     ################################### APPLY TO YCBCR
-    ycbcr_img_blocks = blocks.split_8x8(ycbcr.get_ycbcr_test_image())
+    ycbcr_img_blocks = blocks.split_NxN(ycbcr.get_ycbcr_test_image())
 
     Y_blocks = ycbcr_img_blocks[:,:,:,:,0]
     CB_blocks = ycbcr_img_blocks[:,:,:,:,1]
     CR_blocks = ycbcr_img_blocks[:,:,:,:,2]
 
     my_block = CB_blocks[30, 40]
-    plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+    plt.imshow(my_block, cmap=plt.get_cmap('gray_r'))
     plt.title("Un blocCB (le bloc (30,40))")
     plt.show()
 
     encoded_block = dct.encode_dct(my_block)
     print(f"dct block\n{encoded_block}")
-    plt.imshow(encoded_block, cmap=plt.get_cmap('gray'))
+    plt.imshow(encoded_block, cmap=plt.get_cmap('gray_r'))
     plt.title("BlocCB > DCT")
     plt.show()
 
@@ -63,12 +65,12 @@ if __name__ == "__main__":
     # Quantizing a whole bunch of blocks with slices
     quantized_blocks = quantize_blocks(CB_blocks_dct)
     quantified_block = quantized_blocks[30,40]
-    plt.imshow(quantified_block, cmap=plt.get_cmap('gray'))
+    plt.imshow(quantified_block, cmap=plt.get_cmap('gray_r'))
     plt.title("BlocCB > DCT > Quantification ")
     plt.show()
     print(f"quantized dct block\n{quantified_block}")
 
     decoded_block = dct.decode_dct(quantified_block)
-    plt.imshow(decoded_block, cmap=plt.get_cmap('gray'))
+    plt.imshow(decoded_block, cmap=plt.get_cmap('gray_r'))
     plt.title("BlocCB > DCT > Quantification > IDCT")
     plt.show()

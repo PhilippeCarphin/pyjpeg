@@ -65,14 +65,14 @@ if __name__ == "__main__":
 
     Y_subsample = Y[::2,::2]
 
-    plt.imshow(Y_subsample, cmap=plt.get_cmap('gray'))
+    plt.imshow(Y_subsample, cmap=plt.get_cmap('gray_r'))
     plt.title("Channel Y subsamplé")
     plt.show()
 
-    plt.imshow(CB, cmap=plt.get_cmap('gray'))
+    plt.imshow(CB, cmap=plt.get_cmap('gray_r'))
     plt.title("Channel CB")
     plt.show()
 
-    plt.imshow(CR, cmap=plt.get_cmap('gray'))
+    plt.imshow(CR, cmap=plt.get_cmap('gray_r'))
     plt.title("Channel CR")
     plt.show()

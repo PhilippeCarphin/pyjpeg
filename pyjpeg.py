@@ -49,11 +49,11 @@ blue_blocks = blocks[:,:,:,:,2]
 
 print(red_blocks.shape)
 
-plt.imshow(red_blocks[30,40], cmap = plt.get_cmap('gray'))
+plt.imshow(red_blocks[30,40], cmap = plt.get_cmap('gray_r'))
 plt.show()
-plt.imshow(green_blocks[30,40], cmap = plt.get_cmap('gray'))
+plt.imshow(green_blocks[30,40], cmap = plt.get_cmap('gray_r'))
 plt.show()
-plt.imshow(blue_blocks[30,40], cmap = plt.get_cmap('gray'))
+plt.imshow(blue_blocks[30,40], cmap = plt.get_cmap('gray_r'))
 plt.show()
 
 

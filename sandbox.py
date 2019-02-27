@@ -18,13 +18,13 @@ n_blocks_w = CB_blocks.shape[1]
 
 
 my_block = CB_blocks[30, 40]
-plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+plt.imshow(my_block, cmap=plt.get_cmap('gray_r'))
 plt.title("")
 plt.show()
 # print(my_block)
 
 encoded_block = mdct.encode_dct(my_block)
-# plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+# plt.imshow(my_block, cmap=plt.get_cmap('gray_r'))
 # plt.show()
 # print(encoded_block)
 
@@ -41,8 +41,8 @@ quantified_block = quantized_blocks[30,40]
 print(quantified_block.astype('int8'))
 
 decoded_block = mdct.decode_dct(quantified_block)
-plt.imshow(my_block, cmap=plt.get_cmap('gray'))
+plt.imshow(my_block, cmap=plt.get_cmap('gray_r'))
 plt.show()
-plt.imshow(decoded_block, cmap=plt.get_cmap('gray'))
+plt.imshow(decoded_block, cmap=plt.get_cmap('gray_r'))
 plt.show()
 """
