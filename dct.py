@@ -87,12 +87,13 @@ if __name__ == "__main__":
     plt.show()
 
     ################### Combinaison Linéaire avec 16 coefficients
+    fig_w = 8
     fig = plt.figure(figsize=(blocks.N,blocks.N))
-    plt.title("16 vecteurs de la base DCT")
-    for k in range(16):
-        i = k // 4;
-        j = k % 4;
-        fig.add_subplot(4,4,k+1)
+    plt.title(f"{fig_w**2} vecteurs de la base DCT")
+    for k in range(fig_w * fig_w):
+        i = k // fig_w;
+        j = k % fig_w;
+        fig.add_subplot(fig_w,fig_w,k+1)
         plt.imshow(dct_basis_element(i,j), cmap=plt.get_cmap('gray'))
     plt.show()
     i = 0
