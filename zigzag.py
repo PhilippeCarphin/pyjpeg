@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def zig_zag_block(block):
@@ -86,6 +85,7 @@ def zig_zag_indices(h, w):
 
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
 
     # from blocks import N
 
