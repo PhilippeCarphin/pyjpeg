@@ -14,10 +14,11 @@ def zig_zag_blocks(blocks):
     n_blocks_h, n_blocks_w, block_h, block_w = blocks.shape
     zig_zagged = np.zeros(n_blocks_h * n_blocks_w * block_w * block_h)
     block_wh = block_w * block_h
+    n = 0
     for i in range(n_blocks_h):
-        i_nhh = i * block_wh * n_blocks_w
         for j in range(n_blocks_w):
-            start = i_nhh + j * block_h
+            start = n * block_wh
+            n+=1
             zig_zagged[start: start + block_wh] = zig_zag_block(blocks[i, j, :, :])
             pass
 
@@ -32,13 +33,15 @@ def un_zig_zag_block(line, h, w):
     return block
 
 
-def un_zig_zag_blocks(line, n_blocks_h, n_blocks_w, block_h, block_w):
-    blocks = np.zeros((n_blocks_h, n_blocks_w, block_h, block_w))
+def un_zig_zag_blocks(line, shape):
+    blocks = np.zeros((shape))
+    n_blocks_h, n_blocks_w, block_h, block_w = shape
     block_wh = block_w * block_h
+    n = 0
     for i in range(n_blocks_h):
-        i_nhh = i * block_wh * n_blocks_w
         for j in range(n_blocks_w):
-            start = i_nhh + j * block_h
+            start = n * block_wh
+            n += 1
             blocks[i, j, :, :] = un_zig_zag_block(line[start: start + block_wh], block_h, block_w)
 
     return blocks
@@ -86,11 +89,11 @@ if __name__ == "__main__":
 
     # from blocks import N
 
-    N = 12
+    N = 8
+
 
     a = un_zig_zag_block(np.array(range(N * N)), N, N)
-
-    print(a.astype('int'))
+    print(repr(a.astype('int')))
     plt.imshow(a, cmap=plt.get_cmap('gray'))
     plt.show()
 
@@ -103,7 +106,7 @@ if __name__ == "__main__":
     assert un_zzd.all() == a.astype('int').all(), "Didn't work"
 
     zz = zig_zag_blocks(big_a)
-    print(zz)
-    un_zzd = un_zig_zag_blocks(zz, big_a.shape[0], big_a.shape[1], N, N)
+    print(repr(zz))
+    un_zzd = un_zig_zag_blocks(zz, big_a.shape)
     assert un_zzd.all() == big_a.all(), "didn't work"
     print(un_zzd)
