@@ -196,45 +196,23 @@ class JpegObject():
 
         return rgb_img
 
+def quant_str(q):
+    if q is quantize.Quant1:
+        quant_str = 'quant-std'
+    elif q is quantize.Quant2:
+        quant_str = 'quant-std-modif'
+    elif q is quantize.QuantAgressive:
+        quant_str = 'quant-aggres'
+    elif q is quantize.QuantSuperAgressive:
+        quant_str = 'quant-super-aggres'
+    else:
+        quant_str = "None"
+    return quant_str
 
-if __name__ == "__main__":
-    pass
-    jpegobj = JpegObject(
-        use_huffman=False,
-        use_subsampling=True,
-        use_dct=True,
-        use_quantize=True,
-        # quant=quantize.Quant1,
-        subsample_scheme=(4,2,0) # or (4,1,1) or (4,4,4) ((4,4,4) is equivalent to setting use_quantize to false)
-    )
-    encoded_decoded = jpegobj.encode_decode_file('input_image.png')
-    print(jpegobj.zigzag_length)
-    print(jpegobj.huffman_size // 8)  # parce que huffman_size est la longeur d'une liste de bits
-    plt.imshow(encoded_decoded)
-    plt.show()
-
-
-    # TODO Refaire la meme chose pour plein d'images,
-
-    # - varier le subsampling
-    # - varier la matrice de quant
-
-    # Prendre en note les tailles intiales et compressées
-    # Les tailles se retrouvent dans jpegobj.zigzag_length et huffman_size
-    # qui sont calculés durant la compression dans PyJpeg.encode_decode
-
-    # Prendre en note une évaluation subjective de la dégradation
-
-
-    # TODO Refaire aussi pour une (ou deux si le temps le permet):
-
-    #      Paser l'image plusierus fois dans la compression
-    #          - prendre en notes les dimensions initiales
-    #          - prendre en note le huffman_size final
-    #          - Évaluer subjectivement la dégradation et dire si ça empire de fois en foi. (moi je pense que ça empirera pas trop de fois en fois)
+def generate_images():
     images = [
         'input_image.png',
-        # 'images/asdf',
+        # 'images/asdf', #ADAM ICI!!
     ]
     quants = [
         quantize.Quant1,
@@ -259,21 +237,10 @@ if __name__ == "__main__":
         encoded_decoded = jpegobj.encode_decode_file(img_file)
         print(jpegobj.zigzag_length)
         print(jpegobj.huffman_size // 8) # parce que huffman_size est la longeur d'une liste de bits
-        
-        if quant is quantize.Quant1:
-            quant_str = 'quant-std'
-        elif quant is quantize.Quant2:
-            quant_str = 'quant-std-modif'
-        elif quant is quantize.QuantAgressive:
-            quant_str = 'quant-aggres'
-        elif quant is quantize.QuantSuperAgressive:
-            quant_str = 'quant-super-aggres'
-        else:
-            quant_str = "None"
+
 
         filename = img_file[:-4] # remove the '.png'
-        filepath = os.path.join(os.getcwd(), filename)
-        filename += '_' + str(subsampling_scheme) + '_' + quant_str + '.png'
+        filename += '_' + str(subsampling_scheme) + '_' + quant_str(quant) + '.png'
 
         filepath = os.path.join(os.getcwd(),'images_traitees', filename)
         io.imsave(filepath, encoded_decoded)
@@ -281,4 +248,45 @@ if __name__ == "__main__":
 
 
 
-    # TODO Lire l'énoncé, ils demandent une image faite en utilisant la même matrice à chaque fois (ça je crois que le faire plusieurs fois ne dégradera pas plus ou beaucoup plus que le faire une fois), et avec différentes quant, là on verra
+if __name__ == "__main__":
+    pass
+    jpegobj = JpegObject(
+        use_huffman=False,
+        use_subsampling=True,
+        use_dct=True,
+        use_quantize=True,
+        # quant=quantize.Quant1,
+        subsample_scheme=(4,2,0) # or (4,1,1) or (4,4,4) ((4,4,4) is equivalent to setting use_quantize to false)
+    )
+    encoded_decoded = jpegobj.encode_decode_file('input_image.png')
+    print(jpegobj.zigzag_length)
+    print(jpegobj.huffman_size // 8)  # parce que huffman_size est la longeur d'une liste de bits
+    plt.imshow(encoded_decoded)
+    plt.show()
+
+    generate_images()
+
+    jpeg1 = JpegObject(
+        use_huffman=False,
+        use_subsampling=True,
+        use_dct=True,
+        use_quantize=True,
+        quant=quantize.Quant1,
+        subsample_scheme=(4,2,0)
+    )
+    jpeg2 = JpegObject(
+        use_huffman=False,
+        use_subsampling=True,
+        use_dct=True,
+        use_quantize=True,
+        quant=quantize.Quant2,
+        subsample_scheme=(4,2,0)
+    )
+
+
+    compressed_once = jpeg1.encode_decode_file('input_image.png')
+    compressed_twice = jpeg1.encode_decode(compressed_once)
+    compressed_thrice = jpeg1.encode_decode(compressed_twice)
+
+    plt.imshow(compressed_thrice)
+    plt.show()
