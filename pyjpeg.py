@@ -11,114 +11,169 @@ from skimage import io
 
 import matplotlib.pyplot as plt
 
-
 class JpegObject():
-    steps = {
-        1: 'ycbcr',
-        2: 'subsampling',
-        3: 'blocks',
-        4: 'dct',
-        5: 'zigzag',
-        6: 'huffman'
-    }
     def __init__(self, **kwargs):
         self.use_zigzag=kwargs.get('use_zigzag', True)
         self.use_dct=kwargs.get('use_dct', True)
         self.use_subsampling = True
+        self.subsample_scheme = kwargs.get('subsample_scheme', (4,2,0))
         self.use_dct = True
         self.use_quantize = True
         self.use_zigzag = True
         self.use_huffman = False
         self.image_shape = None
         self.blocks_shape = None
-        self.subsampled_shape = None
+        self.cbcr_shape = None
         self.last_step = None
+        self.huff_code_Y = None
+        self.huff_code_Cb = None
+        self.huff_code_Cr = None
 
+        if self.use_huffman and not self.use_zigzag:
+            raise Exception("Zigzag must be done to do huffman encoding")
 
-# TODO Remplacer les variables golbales par des paramêtres
+    def get_subsampled_blocks(self, ycbcr_img):
+        subsampled = subsampling.scheme_subsample(ycbcr_img, self.subsample_scheme)
+        blocks_Y = blocks.split_NxN(subsampled['Y'])
+        blocks_Cb = blocks.split_NxN(subsampled['Cb'])
+        blocks_Cr = blocks.split_NxN(subsampled['Cr'])
+        self.blocks_shape = blocks_Y.shape
+        self.CbCr_shape = blocks_Cb.shape
+        channels_data = (blocks_Y, blocks_Cb, blocks_Cr)
+        return channels_data
+
+    def undo_subsampling(self, channels_data):
+        Y_channel, Cb_channel, Cr_channel = channels_data
+        ycbcr_img = subsampling.upsample_and_assemble({
+            'Y': Y_channel,
+            'Cb': Cb_channel,
+            'Cr': Cr_channel,
+            'scheme': self.subsample_scheme
+        })
+        return ycbcr_img
+
+    def split_channels(self, ycbcr_blocks):
+        blocks_Y = ycbcr_blocks[:,:,:,:,0]
+        blocks_Cb = ycbcr_blocks[:,:,:,:,1]
+        blocks_Cr = ycbcr_blocks[:,:,:,:,2]
+        self.blocks_shape = blocks_Y.shape
+        self.CbCr_shape = blocks_Cb.shape
+        return (blocks_Y, blocks_Cb, blocks_Cr)
+
+    def combine_channels(self, channels_data):
+        # NOTE, combine channels takes a tuple of channels
+        # while split channels takes things in block form
+        Y_channel, Cb_channel, Cr_channel = channels_data
+        ycbcr_img = np.zeros(Y_channel.shape + (3,))
+        ycbcr_img[:,:,0] = Y_channel
+        ycbcr_img[:,:,1] = Cb_channel
+        ycbcr_img[:,:,2] = Cr_channel
+        return ycbcr_img
+
+    def do_combine_blocks(self, blocks_data):
+        blocks_Y, blocks_Cb, blocks_Cr = blocks_data
+        # Combinaison de blocs
+        Y_channel = blocks.combine_NxN_channel(blocks_Y)
+        Cb_channel = blocks.combine_NxN_channel(blocks_Cb)
+        Cr_channel = blocks.combine_NxN_channel(blocks_Cr)
+        ycbcr_data = (Y_channel, Cb_channel, Cr_channel)
+        return ycbcr_data
+
+    def do_dct(self, ycbcr_data):
+        blocks_Y, blocks_Cb, blocks_Cr = ycbcr_data
+        dct_blocks_Y = dct.dct_encode_blocks(blocks_Y)
+        dct_blocks_Cb = dct.dct_encode_blocks(blocks_Cb)
+        dct_blocks_Cr = dct.dct_encode_blocks(blocks_Cr)
+        dct_blocks_data = (dct_blocks_Y, dct_blocks_Cb, dct_blocks_Cr)
+        return dct_blocks_data
+
+    def undo_dct(self, dct_blocks_data):
+        dct_blocks_Y, dct_blocks_Cb, dct_blocks_Cr = dct_blocks_data
+        blocks_Y = dct.dct_decode_blocks(dct_blocks_Y)
+        blocks_Cb = dct.dct_decode_blocks(dct_blocks_Cb)
+        blocks_Cr = dct.dct_decode_blocks(dct_blocks_Cr)
+        blocks_data = (blocks_Y, blocks_Cb, blocks_Cr)
+        return blocks_data
+
+    def do_quantize(self, blocks_data):
+        blocks_Y, blocks_Cb, blocks_Cr = blocks_data
+        quantized_blocks_Y = quantize.quantize_blocks(blocks_Y)
+        quantized_blocks_Cb = quantize.quantize_blocks(blocks_Cb)
+        quantized_blocks_Cr = quantize.quantize_blocks(blocks_Cr)
+        quantize_data = (quantized_blocks_Y, quantized_blocks_Cb, quantized_blocks_Cr)
+        return quantize_data
+
+    def do_zigzag(self, blocks_data):
+        blocks_Y, blocks_Cb, blocks_Cr = blocks_data
+        zigzag_Y = zigzag.zig_zag_blocks(blocks_Y)
+        zigzag_Cb = zigzag.zig_zag_blocks(blocks_Cb)
+        zigzag_Cr = zigzag.zig_zag_blocks(blocks_Cr)
+        zigzag_data = (zigzag_Y, zigzag_Cb, zigzag_Cr)
+        return zigzag_data
+
+    def undo_zigzag(self, zigzag_data):
+        zigzag_Y, zigzag_Cb, zigzag_Cr = zigzag_data
+        blocks_Y = zigzag.un_zig_zag_blocks(zigzag_Y, self.blocks_shape)
+        blocks_Cb = zigzag.un_zig_zag_blocks(zigzag_Cb, self.CbCr_shape)
+        blocks_Cr = zigzag.un_zig_zag_blocks(zigzag_Cr, self.CbCr_shape)
+        blocks_data = (blocks_Y, blocks_Cb, blocks_Cr)
+        return blocks_data
+
+    def do_huffman(self, zigzag_data):
+        zigzag_Y, zigzag_Cb, zigzag_Cr = zigzag_data
+        huffed_Y = huffman.huffman_encode(zigzag_Y.astype('uint8'))
+        huffed_Cb = huffman.huffman_encode(zigzag_Cb.astype('uint8'))
+        huffed_Cr = huffman.huffman_encode(zigzag_Cr.astype('uint8'))
+        huffman_data = (huffed_Y, huffed_Cb, huffed_Cr)
+        return huffman_data
+
+    def undo_huffman(self, huffman_data):
+        huffed_Y, huffed_Cb, huffed_Cr = huffman_data
+        zigzag_Y = np.uint8(huffman.huffman_decode(huffed_Y['data'], huffed_Y['codebook'])).astype('float')
+        zigzag_Cb = np.uint8(huffman.huffman_decode(huffed_Cb['data'], huffed_Cb['codebook'])).astype('float')
+        zigzag_Cr = np.uint8(huffman.huffman_decode(huffed_Cr['data'], huffed_Cr['codebook'])).astype('float')
+        zigzag_data = (zigzag_Y, zigzag_Cb, zigzag_Cr)
+        return zigzag_data
+
     def encode_decode(self, filename):
 
         rgb_img = image.open_image_as_ndarray(filename)
         ycbcr_img = ycbcr.rgb2ycbcr(rgb_img)
-
         ycbcr_blocks = blocks.split_NxN(ycbcr_img)
+        self.blocks_shape = ycbcr_blocks[:,:,:,:,0].shape
 
         if self.use_subsampling:
-            subsampled = subsampling.scheme_subsample(ycbcr_img, (4,2,0))
-            blocks_Y = blocks.split_NxN(subsampled['Y'])
-            blocks_Cb = blocks.split_NxN(subsampled['Cb'])
-            blocks_Cr = blocks.split_NxN(subsampled['Cr'])
+            ycbcr_data = self.get_subsampled_blocks(ycbcr_img)
         else:
-            blocks_Y = ycbcr_blocks[:,:,:,:,0]
-            blocks_Cb = ycbcr_blocks[:,:,:,:,1]
-            blocks_Cr = ycbcr_blocks[:,:,:,:,2]
-
-        subsampled_shape = blocks_Cb.shape
-        blocks_shape = blocks_Y.shape
+            ycbcr_data = self.split_channels(ycbcr_blocks)
 
         if self.use_dct:
-            blocks_Y = dct.dct_encode_blocks(blocks_Y)
-            blocks_Cb = dct.dct_encode_blocks(blocks_Cb)
-            blocks_Cr = dct.dct_encode_blocks(blocks_Cr)
-
+            ycbcr_data = self.do_dct(ycbcr_data)
         if self.use_quantize:
-            blocks_Y = quantize.quantize_blocks(blocks_Y)
-            blocks_Cb = quantize.quantize_blocks(blocks_Cb)
-            blocks_Cr = quantize.quantize_blocks(blocks_Cr)
-
+            ycbcr_data = self.do_quantize(ycbcr_data)
         if self.use_zigzag:
-            zigzag_Y = zigzag.zig_zag_blocks(blocks_Y)
-            zigzag_Cb = zigzag.zig_zag_blocks(blocks_Cb)
-            zigzag_Cr = zigzag.zig_zag_blocks(blocks_Cr)
-            zigzag_object = {
-                'data': (zigzag_Y, zigzag_Cb, zigzag_Cr),
-                'full_shape': blocks_Y.shape,
-                'CbCr_shape': blocks_Cb.shape
-            }
-            if self.use_huffman:
-                huffed_Y = huffman.huffman_encode(zigzag_Y.astype('uint8'))
-                huffed_Cb = huffman.huffman_encode(zigzag_Cb.astype('uint8'))
-                huffed_Cr = huffman.huffman_encode(zigzag_Cr.astype('uint8'))
-                huffman_object = {
-                    'data': (huffed_Y, huffed_Cb, huffed_Cr),
-                    'subsampling_scheme': (4,2,0),
-                    'img_shape': ycbcr_img.shape,
-                    'Y_shape': blocks_Y.shape,
-                    'Cr_shape': blocks_Cr.shape}
-    ################# BEGIN DECODE #################################################
-                # Undo Huffman
-                huffed_Y, huffed_Cb, huffed_Cr = huffman_object['data']
-                zigzag_Y = np.uint8(huffman.huffman_decode(huffed_Y['data'], huffed_Y['codebook'])).astype('float')
-                zigzag_Cb = np.uint8(huffman.huffman_decode(huffed_Cb['data'], huffed_Cb['codebook'])).astype('float')
-                zigzag_Cr = np.uint8(huffman.huffman_decode(huffed_Cr['data'], huffed_Cr['codebook'])).astype('float')
+            zigzag_data = self.do_zigzag(ycbcr_data)
+        if self.use_huffman:
+            huffman_data = self.do_huffman(zigzag_data)
 
-            zigzag_Y, zigzag_Cb, zigzag_Cr = zigzag_object['data']
-            # Undo Zigzag
-            blocks_Y = zigzag.un_zig_zag_blocks(zigzag_Y, zigzag_object['full_shape'])
-            blocks_Cb = zigzag.un_zig_zag_blocks(zigzag_Cb, zigzag_object['CbCr_shape'])
-            blocks_Cr = zigzag.un_zig_zag_blocks(zigzag_Cr, zigzag_object['CbCr_shape'])
+################# BEGIN DECODE #################################################
 
+        if self.use_huffman:
+            zigzag_data = self.undo_huffman(huffman_data)
+        if self.use_zigzag:
+            blocks_data = self.undo_zigzag(zigzag_data)
         if self.use_dct:
-            blocks_Y = dct.dct_decode_blocks(blocks_Y)
-            blocks_Cb = dct.dct_decode_blocks(blocks_Cb)
-            blocks_Cr = dct.dct_decode_blocks(blocks_Cr)
+            # takes blocks_data and spits out blocks_data
+            blocks_data = self.undo_dct(blocks_data)
 
-        Y_channel = blocks.combine_NxN_channel(blocks_Y)
-        Cb_channel = blocks.combine_NxN_channel(blocks_Cb)
-        Cr_channel = blocks.combine_NxN_channel(blocks_Cr)
+        channels_data = self.do_combine_blocks(blocks_data)
 
         if self.use_subsampling:
-            ycbcr_img = subsampling.upsample_and_assemble({
-                'Y': Y_channel,
-                'Cb': Cb_channel,
-                'Cr': Cr_channel,
-                'scheme': (4,2,0)
-            })
+            # Undo subsampling combine les channels en même temps, peut-être je
+            # le changerai plus tard
+            self.undo_subsampling(channels_data)
         else:
-            ycbcr_img = np.zeros(Y_channel.shape + (3,))
-            ycbcr_img[:,:,0] = Y_channel
-            ycbcr_img[:,:,1] = Cb_channel
-            ycbcr_img[:,:,2] = Cr_channel
+            ycbcr_img = self.combine_channels(channels_data)
 
         rgb_img = ycbcr.ycbcr2rgb(ycbcr_img)
 
