@@ -140,9 +140,12 @@ class JpegObject():
         zigzag_data = (zigzag_Y, zigzag_Cb, zigzag_Cr)
         return zigzag_data
 
-    def encode_decode(self, filename):
-
+    def encode_decode_file(self, filename):
         rgb_img = image.open_image_as_ndarray(filename)
+        return self.encode_decode(rgb_img)
+
+    def encode_decode(self, rgb_img):
+
         ycbcr_img = ycbcr.rgb2ycbcr(rgb_img)
         ycbcr_blocks = blocks.split_NxN(ycbcr_img)
         self.blocks_shape = ycbcr_blocks[:, :, :, :, 0].shape
@@ -200,10 +203,10 @@ if __name__ == "__main__":
         use_subsampling=True,
         use_dct=True,
         use_quantize=True,
-        quant=quantize.Quant1,
+        # quant=quantize.Quant1,
         subsample_scheme=(4,2,0) # or (4,1,1) or (4,4,4) ((4,4,4) is equivalent to setting use_quantize to false)
     )
-    encoded_decoded = jpegobj.encode_decode('input_image.png')
+    encoded_decoded = jpegobj.encode_decode_file('input_image.png')
     print(jpegobj.zigzag_length)
     print(jpegobj.huffman_size // 8)  # parce que huffman_size est la longeur d'une liste de bits
     plt.imshow(encoded_decoded)
