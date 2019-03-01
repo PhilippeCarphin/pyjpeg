@@ -10,27 +10,53 @@ def get_frequencies(big_line):
         frequencies[symbol] += 1
     return frequencies.items()
 
-
-if __name__ == '__main__':
-    import blocks
-    block = blocks.get_one_test_NxN_block()
-
-    print(block.shape)
-
-    line = zigzag.zig_zag_block(block)
-    print(line)
-
-    freqs = get_frequencies(line)
-    print(freqs)
-
+def get_huffman_codebook(big_line):
+    freqs = get_frequencies(big_line)
     huff_code = huffman.codebook(freqs)
-    print(huff_code)
+    return huff_code
 
+
+def huffman_encode(big_line):
+    huff_code = get_huffman_codebook(big_line)
     h_line = []
-    for s in line:
+    for s in big_line:
         h_line += [int(b) for b in huff_code[s]]
+    return { 'data': h_line, 'codebook': huff_code}
 
-    print(h_line)
 
-    print(f'len(line) = {len(line)}, h_line = {len(h_line)/8}')
-    print(f'packbits result: {np.packbits(h_line)}')
+def huffman_encode_packed(big_line):
+    encoded = huffman_encode(big_line)
+    encoded_packed = np.packbits(encoded['data'])
+
+    return {
+        'data': encoded_packed,
+        'original_length': len(encoded['data']),
+        'codebook': encoded['codebook']
+    }
+
+
+def huffman_decode_packed(packed_line):
+
+    unpacked = np.unpackbits(packed_line['data'])
+    unpacked_bits_list = list(unpacked[:packed_line['original_length']])
+    return huffman_decode(unpacked_bits_list, packed_line['codebook'])
+
+
+def huffman_decode(bit_list, codebook):
+    reverse_code = {codebook[symbol]: symbol for symbol in codebook}
+
+    chunk_list = []
+    try:
+        i = iter(bit_list)
+        while True:
+            bits = ''
+            while bits not in reverse_code:
+                bits += str(next(i))
+            chunk_list.append(bits)
+    except StopIteration:
+        pass
+
+    decoded = map(lambda bits : reverse_code[bits], chunk_list)
+
+    return decoded
+
