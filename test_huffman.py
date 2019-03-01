@@ -10,12 +10,9 @@ class TestHuffman(unittest.TestCase):
         self.input = np.random.randint(30, size=(20))
 
     def test_huffman_encode(self):
-
         encoded = huffman.huffman_encode(self.input)
-
         self.assertIn('data', encoded)
         self.assertIn('codebook', encoded)
-
 
     def test_huffman_codebook(self):
         block = blocks.get_one_test_NxN_block()
@@ -31,12 +28,3 @@ class TestHuffman(unittest.TestCase):
         decoded = np.array(list(decoded))
 
         self.assertEqual(self.input.all(), decoded.all())
-
-    def x_test_huffman_encode_packed(self):
-        res = huffman.huffman_encode_packed(self.input)
-
-    def x_test_huffman_decode_packed(self):
-        packed = huffman.huffman_encode_packed(self.input)
-        res = huffman.huffman_decode_packed(packed)
-        self.assertEqual(self.input.all(), np.array(list(res)).all())
-

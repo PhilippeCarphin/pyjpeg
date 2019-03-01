@@ -1,3 +1,7 @@
+import os
+import numpy as np
+from skimage import io
+
 import image
 import ycbcr
 import subsampling
@@ -6,8 +10,6 @@ import dct
 import quantize
 import zigzag
 import huffman_8770 as huffman
-import numpy as np
-from skimage import io
 
 import matplotlib.pyplot as plt
 
@@ -15,7 +17,7 @@ class JpegObject():
     def __init__(self, **kwargs):
         self.use_zigzag=kwargs.get('use_zigzag', True)
         self.use_dct=kwargs.get('use_dct', True)
-        self.use_subsampling = True
+        self.use_subsampling = kwargs.get('use_subsampling', True)
         self.subsample_scheme = kwargs.get('subsample_scheme', (4,2,0))
         self.use_dct = True
         self.use_quantize = True
@@ -179,17 +181,18 @@ class JpegObject():
 
         rgb_img = ycbcr.ycbcr2rgb(ycbcr_img)
 
-        io.imsave('/Users/pcarphin/Desktop/output.png', rgb_img)
+        io.imsave(os.path.expanduser('~/Desktop/output.png'), rgb_img)
 
         return rgb_img
 
 if __name__ == "__main__":
-    jpegobj = JpegObject()
-    encoded_decoded = jpegobj.encode_decode('input_image.png')
-    print(jpegobj.zigzag_length)
-    print(jpegobj.huffman_size//8)
-    plt.imshow(encoded_decoded)
-    plt.show()
+    pass
+    # jpegobj = JpegObject()
+    # encoded_decoded = jpegobj.encode_decode('input_image.png')
+    # print(jpegobj.zigzag_length)
+    # print(jpegobj.huffman_size//8)
+    # plt.imshow(encoded_decoded)
+    # plt.show()
 
 
 

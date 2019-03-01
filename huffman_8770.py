@@ -23,25 +23,6 @@ def huffman_encode(big_line):
         h_line += [int(b) for b in huff_code[s]]
     return { 'data': h_line, 'codebook': huff_code}
 
-
-def huffman_encode_packed(big_line):
-    encoded = huffman_encode(big_line)
-    encoded_packed = np.packbits(encoded['data'])
-
-    return {
-        'data': encoded_packed,
-        'original_length': len(encoded['data']),
-        'codebook': encoded['codebook']
-    }
-
-
-def huffman_decode_packed(packed_line):
-
-    unpacked = np.unpackbits(packed_line['data'])
-    unpacked_bits_list = list(unpacked[:packed_line['original_length']])
-    return huffman_decode(unpacked_bits_list, packed_line['codebook'])
-
-
 def huffman_decode(bit_list, codebook):
     reverse_code = {codebook[symbol]: symbol for symbol in codebook}
 
