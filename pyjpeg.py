@@ -20,7 +20,7 @@ class JpegObject():
         self.use_dct = True
         self.use_quantize = True
         self.use_zigzag = True
-        self.use_huffman = False
+        self.use_huffman = True
         self.image_shape = None
         self.blocks_shape = None
         self.cbcr_shape = None
@@ -121,10 +121,12 @@ class JpegObject():
 
     def do_huffman(self, zigzag_data):
         zigzag_Y, zigzag_Cb, zigzag_Cr = zigzag_data
+        self.zigzag_length = len(zigzag_Y) + len(zigzag_Cb) + len(zigzag_Cr)
         huffed_Y = huffman.huffman_encode(zigzag_Y.astype('uint8'))
         huffed_Cb = huffman.huffman_encode(zigzag_Cb.astype('uint8'))
         huffed_Cr = huffman.huffman_encode(zigzag_Cr.astype('uint8'))
         huffman_data = (huffed_Y, huffed_Cb, huffed_Cr)
+        self.huffman_size = len(huffed_Y['data']) + len(huffed_Cb['data']) + len(huffed_Cr['data'])
         return huffman_data
 
     def undo_huffman(self, huffman_data):
@@ -184,6 +186,10 @@ class JpegObject():
 if __name__ == "__main__":
     jpegobj = JpegObject()
     encoded_decoded = jpegobj.encode_decode('input_image.png')
+    print(jpegobj.zigzag_length)
+    print(jpegobj.huffman_size//8)
+    plt.imshow(encoded_decoded)
+    plt.show()
 
 
 
