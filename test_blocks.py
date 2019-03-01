@@ -18,9 +18,9 @@ class TestBlocks(unittest.TestCase):
 
         first_channel_combined = blocks.combine_NxN_channel(first_channel_blocks)
 
-        print(first_channel_combined.shape)
-        print(first_channel.shape)
-        print(first_channel_combined[:8, :8])
-        print(first_channel)
+        # print(first_channel_combined.shape)
+        # print(first_channel.shape)
+        # print(first_channel_combined[:8, :8])
+        # print(first_channel)
 
         self.assertEqual(arr[:, :, 0].all(), first_channel_combined.all())
