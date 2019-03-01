@@ -87,3 +87,16 @@ class TestSubsampling(unittest.TestCase):
             output = upsampled_assembled[i, j,:]
             self.assertTrue(np.array_equal(output, expected))
             verify_repetition_ij(i,j)
+
+    def test_exceptions(self):
+        self.assertRaises(
+            NotImplementedError,
+            subsampling.upsample_and_assemble,
+            {'scheme':(1,2,3)}
+        )
+
+        self.assertRaises(
+            NotImplementedError,
+            subsampling.scheme_subsample,
+            self.input_img, (1,2,3)
+        )

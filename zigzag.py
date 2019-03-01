@@ -85,28 +85,4 @@ def zig_zag_indices(h, w):
 
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-
-    # from blocks import N
-
-    N = 8
-
-
-    a = un_zig_zag_block(np.array(range(N * N)), N, N)
-    print(repr(a.astype('int')))
-    plt.imshow(a, cmap=plt.get_cmap('gray'))
-    plt.show()
-
-    big_a = np.zeros((2, 1, N, N))
-    big_a[0, 0, :, :] = a[:, :]
-    big_a[1, 0, :, :] = -a
-
-    zz = zig_zag_block(a)
-    un_zzd = un_zig_zag_block(zz, N, N).astype('int')
-    assert un_zzd.all() == a.astype('int').all(), "Didn't work"
-
-    zz = zig_zag_blocks(big_a)
-    print(repr(zz))
-    un_zzd = un_zig_zag_blocks(zz, big_a.shape)
-    assert un_zzd.all() == big_a.all(), "didn't work"
-    print(un_zzd)
+    pass
