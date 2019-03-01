@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from skimage import io
+import itertools
 
 import image
 import ycbcr
@@ -232,7 +233,7 @@ if __name__ == "__main__":
     #          - prendre en note le huffman_size final
     #          - Évaluer subjectivement la dégradation et dire si ça empire de fois en foi. (moi je pense que ça empirera pas trop de fois en fois)
     images = [
-        'input_image.py',
+        'input_image.png',
         # 'images/asdf',
     ]
     quants = [
@@ -246,7 +247,7 @@ if __name__ == "__main__":
         (4,2,0),
         (4,1,1)
     ]
-    for quant, subsampling_scheme, img_file in itertools.product(quants, subsamplings, images):
+    for quant, subsampling_scheme, img_file in itertools.product(quants, subsampling_schemes, images):
         jpegobj = JpegObject(
             use_huffman=False,
             use_subsampling=True,
@@ -267,10 +268,17 @@ if __name__ == "__main__":
             quant_str = 'quant-aggres'
         elif quant is quantize.QuantSuperAgressive:
             quant_str = 'quant-super-aggres'
-            filename = img_file[-4] # remove the '.png'
-        filename += '_' + str(subsampling_scheme) + '.png'
+        else:
+            quant_str = "None"
 
-        io.imsave(os.path.join(os.getcwd(), filename))
+        filename = img_file[:-4] # remove the '.png'
+        filepath = os.path.join(os.getcwd(), filename)
+        filename += '_' + str(subsampling_scheme) + '_' + quant_str + '.png'
+
+        filepath = os.path.join(os.getcwd(),'images_traitees', filename)
+        io.imsave(filepath, encoded_decoded)
+        print("saved file {}".format(filepath))
+
 
 
     # TODO Lire l'énoncé, ils demandent une image faite en utilisant la même matrice à chaque fois (ça je crois que le faire plusieurs fois ne dégradera pas plus ou beaucoup plus que le faire une fois), et avec différentes quant, là on verra
