@@ -231,6 +231,46 @@ if __name__ == "__main__":
     #          - prendre en notes les dimensions initiales
     #          - prendre en note le huffman_size final
     #          - Évaluer subjectivement la dégradation et dire si ça empire de fois en foi. (moi je pense que ça empirera pas trop de fois en fois)
+    images = [
+        'input_image.py',
+        # 'images/asdf',
+    ]
+    quants = [
+        quantize.Quant1,
+        quantize.Quant2,
+        quantize.QuantAgressive,
+        quantize.QuantSuperAgressive
+    ]
+    subsampling_schemes = [
+        (4,4,4),
+        (4,2,0),
+        (4,1,1)
+    ]
+    for quant, subsampling_scheme, img_file in itertools.product(quants, subsamplings, images):
+        jpegobj = JpegObject(
+            use_huffman=False,
+            use_subsampling=True,
+            use_dct=True,
+            use_quantize=True,
+            quant=quant,
+            subsample_scheme=subsampling_scheme
+        )
+        encoded_decoded = jpegobj.encode_decode_file(img_file)
+        print(jpegobj.zigzag_length)
+        print(jpegobj.huffman_size // 8) # parce que huffman_size est la longeur d'une liste de bits
+        
+        if quant is quantize.Quant1:
+            quant_str = 'quant-std'
+        elif quant is quantize.Quant2:
+            quant_str = 'quant-std-modif'
+        elif quant is quantize.QuantAgressive:
+            quant_str = 'quant-aggres'
+        elif quant is quantize.QuantSuperAgressive:
+            quant_str = 'quant-super-aggres'
+            filename = img_file[-4] # remove the '.png'
+        filename += '_' + str(subsampling_scheme) + '.png'
+
+        io.imsave(os.path.join(os.getcwd(), filename))
+
 
     # TODO Lire l'énoncé, ils demandent une image faite en utilisant la même matrice à chaque fois (ça je crois que le faire plusieurs fois ne dégradera pas plus ou beaucoup plus que le faire une fois), et avec différentes quant, là on verra
-
