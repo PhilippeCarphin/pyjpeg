@@ -22,6 +22,7 @@ class JpegObject():
         self.subsample_scheme = kwargs.get('subsample_scheme', (4, 2, 0))
         self.use_dct = True
         self.use_quantize = kwargs.get('use_quantize', True)
+        self.quant = kwargs.get('quant', quantize.Quant1)
         self.use_zigzag = True
         self.use_huffman = kwargs.get('use_huffman', True)
         self.image_shape = None
@@ -198,7 +199,9 @@ if __name__ == "__main__":
         use_huffman=False,
         use_subsampling=True,
         use_dct=True,
-        use_quantize=True
+        use_quantize=True,
+        quant=quantize.Quant1,
+        subsample_scheme=(4,2,0) # or (4,1,1) or (4,4,4) ((4,4,4) is equivalent to setting use_quantize to false)
     )
     encoded_decoded = jpegobj.encode_decode('input_image.png')
     print(jpegobj.zigzag_length)
