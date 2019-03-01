@@ -15,9 +15,9 @@ def upsample(arr, up_h, up_w) -> []:
        [3, 3, 3, 4, 4, 4]]
     """
 
-    return np.repeat(
+    return np.array(np.repeat(
         [list(np.repeat(row, up_w)) for row in arr],
-        repeats=up_h, axis=0)
+        repeats=up_h, axis=0)).tolist()
 
 
 if __name__ == "__main__":
