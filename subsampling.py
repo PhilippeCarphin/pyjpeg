@@ -1,6 +1,17 @@
 import image
 import blocks
 import matplotlib.pyplot as plt
+import numpy as np
+
+
+def upsample(arr, up_h, up_w) -> []:
+    """retourner un array qui a la shape (2d_arr.shape[0] * up_h, 2d_arr.shape[1] * up[w])
+    et remplir le vide avec des 0.
+    """
+
+    return np.repeat(
+        [list(np.repeat(row, up_w)) for row in arr],
+        repeats=up_h, axis=0)
 
 
 if __name__ == "__main__":
