@@ -27,4 +27,4 @@ class TestHuffman(unittest.TestCase):
         decoded = huffman.huffman_decode(encoded['data'], encoded['codebook'])
         decoded = np.array(list(decoded))
 
-        self.assertEqual(self.input.all(), decoded.all())
+        self.assertTrue(np.array_equal(self.input, decoded))

@@ -20,9 +20,9 @@ class JpegObject():
         self.use_subsampling = kwargs.get('use_subsampling', True)
         self.subsample_scheme = kwargs.get('subsample_scheme', (4,2,0))
         self.use_dct = True
-        self.use_quantize = True
+        self.use_quantize = kwargs.get('use_quantize', True)
         self.use_zigzag = True
-        self.use_huffman = True
+        self.use_huffman = kwargs.get('use_huffman', True)
         self.image_shape = None
         self.blocks_shape = None
         self.cbcr_shape = None
@@ -110,6 +110,7 @@ class JpegObject():
         zigzag_Y = zigzag.zig_zag_blocks(blocks_Y)
         zigzag_Cb = zigzag.zig_zag_blocks(blocks_Cb)
         zigzag_Cr = zigzag.zig_zag_blocks(blocks_Cr)
+        self.zigzag_length = len(zigzag_Y) + len(zigzag_Cb) + len(zigzag_Cr)
         zigzag_data = (zigzag_Y, zigzag_Cb, zigzag_Cr)
         return zigzag_data
 
@@ -123,7 +124,6 @@ class JpegObject():
 
     def do_huffman(self, zigzag_data):
         zigzag_Y, zigzag_Cb, zigzag_Cr = zigzag_data
-        self.zigzag_length = len(zigzag_Y) + len(zigzag_Cb) + len(zigzag_Cr)
         huffed_Y = huffman.huffman_encode(zigzag_Y.astype('uint8'))
         huffed_Cb = huffman.huffman_encode(zigzag_Cb.astype('uint8'))
         huffed_Cr = huffman.huffman_encode(zigzag_Cr.astype('uint8'))
@@ -175,7 +175,7 @@ class JpegObject():
         if self.use_subsampling:
             # Undo subsampling combine les channels en même temps, peut-être je
             # le changerai plus tard
-            self.undo_subsampling(channels_data)
+            ycbcr_img = self.undo_subsampling(channels_data)
         else:
             ycbcr_img = self.combine_channels(channels_data)
 
@@ -187,12 +187,17 @@ class JpegObject():
 
 if __name__ == "__main__":
     pass
-    # jpegobj = JpegObject()
-    # encoded_decoded = jpegobj.encode_decode('input_image.png')
-    # print(jpegobj.zigzag_length)
+    jpegobj = JpegObject(
+        use_huffman=False,
+        use_subsampling=True,
+        use_dct=True,
+        use_quantize=True
+    )
+    encoded_decoded = jpegobj.encode_decode('input_image.png')
+    print(jpegobj.zigzag_length)
     # print(jpegobj.huffman_size//8)
-    # plt.imshow(encoded_decoded)
-    # plt.show()
+    plt.imshow(encoded_decoded)
+    plt.show()
 
 
 
