@@ -24,7 +24,7 @@ def quantize_one_block(block, quant=Quant1):
     qb[:,:] = np.round(np.divide(block[:,:], quant))
     return qb.astype('float')
 
-def quantize_blocks(blocks, quant=Quant2):
+def quantize_blocks(blocks, quant=Quant1):
     assert blocks.shape[2:] == quant.shape, f"blocks must have same shape as quant"
     """ Takes an array of shape (n_blocks_h, n_blocks_w, N, N) and
     goes through all the blocks to quantize them"""

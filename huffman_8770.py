@@ -20,7 +20,7 @@ def huffman_encode(big_line):
     huff_code = get_huffman_codebook(big_line)
     h_line = []
     for s in big_line:
-        h_line += [int(b) for b in huff_code[s]]
+        h_line += [b for b in huff_code[s]]
     return { 'data': h_line, 'codebook': huff_code}
 
 def huffman_decode(bit_list, codebook):

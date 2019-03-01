@@ -128,14 +128,13 @@ class JpegObject():
         huffed_Cb = huffman.huffman_encode(zigzag_Cb.astype('uint8'))
         huffed_Cr = huffman.huffman_encode(zigzag_Cr.astype('uint8'))
         huffman_data = (huffed_Y, huffed_Cb, huffed_Cr)
-        self.huffman_size = len(huffed_Y['data']) + len(huffed_Cb['data']) + len(huffed_Cr['data'])
         return huffman_data
 
     def undo_huffman(self, huffman_data):
         huffed_Y, huffed_Cb, huffed_Cr = huffman_data
-        zigzag_Y = np.uint8(huffman.huffman_decode(huffed_Y['data'], huffed_Y['codebook'])).astype('float')
-        zigzag_Cb = np.uint8(huffman.huffman_decode(huffed_Cb['data'], huffed_Cb['codebook'])).astype('float')
-        zigzag_Cr = np.uint8(huffman.huffman_decode(huffed_Cr['data'], huffed_Cr['codebook'])).astype('float')
+        zigzag_Y = np.uint8(huffman.huffman_decode(huffed_Y['data'], huffed_Y['codebook']))
+        zigzag_Cb = np.uint8(huffman.huffman_decode(huffed_Cb['data'], huffed_Cb['codebook']))
+        zigzag_Cr = np.uint8(huffman.huffman_decode(huffed_Cr['data'], huffed_Cr['codebook']))
         zigzag_data = (zigzag_Y, zigzag_Cb, zigzag_Cr)
         return zigzag_data
 
@@ -164,6 +163,12 @@ class JpegObject():
 
         if self.use_huffman:
             zigzag_data = self.undo_huffman(huffman_data)
+
+        if not self.use_huffman:
+            huffman_data = self.do_huffman(zigzag_data)
+            huffed_Y, huffed_Cb, huffed_Cr = huffman_data
+            self.huffman_size = len(huffed_Y['data']) + len(huffed_Cb['data']) + len(huffed_Cr['data'])
+
         if self.use_zigzag:
             blocks_data = self.undo_zigzag(zigzag_data)
         if self.use_dct:
@@ -195,7 +200,7 @@ if __name__ == "__main__":
     )
     encoded_decoded = jpegobj.encode_decode('input_image.png')
     print(jpegobj.zigzag_length)
-    # print(jpegobj.huffman_size//8)
+    print(jpegobj.huffman_size//8) # parce que huffman_size est la lognueur d'une liste de bits
     plt.imshow(encoded_decoded)
     plt.show()
 
