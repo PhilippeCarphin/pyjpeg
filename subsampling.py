@@ -5,8 +5,14 @@ import numpy as np
 
 
 def upsample(arr, up_h, up_w) -> []:
-    """retourner un array qui a la shape (2d_arr.shape[0] * up_h, 2d_arr.shape[1] * up[w])
-    et remplir le vide avec des 0.
+    """ Duplicate rows `up_h` times and columns `up_w` times
+
+    ex:
+    upsample( [[1,2],[3,4], 2 ,3 )
+    ->[[1, 1, 1, 2, 2, 2],
+       [1, 1, 1, 2, 2, 2],
+       [3, 3, 3, 4, 4, 4],
+       [3, 3, 3, 4, 4, 4]]
     """
 
     return np.repeat(
