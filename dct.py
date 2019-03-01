@@ -36,6 +36,15 @@ def dct_encode_blocks(blocks):
             dct_blocks[i,j,:,:] = encode_dct(blocks[i,j,:,:])
     return dct_blocks
 
+def dct_decode_blocks(blocks):
+    n_blocks_h = blocks.shape[0]
+    n_blocks_w = blocks.shape[1]
+    idct_blocks = np.empty_like(blocks).astype('float')
+    for i in range(n_blocks_h):
+        for j in range(n_blocks_w):
+            idct_blocks[i,j,:,:] = decode_dct(blocks[i,j,:,:])
+    return idct_blocks
+
 
 if __name__ == "__main__":
     pass

@@ -9,7 +9,8 @@ import huffman_8770 as huffman
 import numpy as np
 
 import matplotlib.pyplot as plt
-subsample = True
+subsample = False
+use_dct = True
 def encode(filename):
     rgb_img = image.open_image_as_ndarray(filename)
 
@@ -30,12 +31,27 @@ def encode(filename):
         blocks_Cb = blocks_Cb_ss
         blocks_Cr = blocks_Cr_ss
 
+    if use_dct:
+        blocks_Y = dct.dct_encode_blocks(blocks_Y)
+        blocks_Cb = dct.dct_encode_blocks(blocks_Cb)
+        blocks_Cr = dct.dct_encode_blocks(blocks_Cr)
+
+    if quantize:
+        blocks_Y = quantize.quantize_blocks(blocks_Y)
+        blocks_Cb = quantize.quantize_blocks(blocks_Cb)
+        blocks_Cr = quantize.quantize_blocks(blocks_Cr)
 
 
     return (blocks_Y, blocks_Cb, blocks_Cr)
 
 def decode(encoded):
     blocks_Y, blocks_Cb, blocks_Cr = encoded
+
+    if use_dct:
+        blocks_Y = dct.dct_decode_blocks(blocks_Y)
+        blocks_Cb = dct.dct_decode_blocks(blocks_Cb)
+        blocks_Cr = dct.dct_decode_blocks(blocks_Cr)
+
 
     Y_channel = blocks.combine_NxN_channel(blocks_Y)
     Cb_channel = blocks.combine_NxN_channel(blocks_Cb)
@@ -63,6 +79,7 @@ def decode(encoded):
 
 
 if __name__ == "__main__":
+    img_input = image.get_test_image()
     encoded = encode('input_image.png')
 
     rgb_img = decode(encoded)

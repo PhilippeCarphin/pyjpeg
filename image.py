@@ -18,7 +18,7 @@ def get_test_image():
     img = io.imread('input_image.png')
     h = img.shape[0]
     w = img.shape[1]
-    img = img[:h - h % 16, :w - w % 16, :]
+    img = img[:h - h % 32, :w - w % 32, :]
     return img
 
 
