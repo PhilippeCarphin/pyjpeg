@@ -12,10 +12,24 @@ def split_NxN(img):
     )
     return blocks
 
+def combine_NxN_channel(blocks):
+    np.block(blocks)
+    rows = []
+    for i in range(blocks.shape[0]):
+        row = []
+        for j in range(blocks.shape[1]):
+            row.append(blocks[i,j,:,:])
+        rows.append(row)
+
+
+    inter = np.block(rows)
+
+    return inter
+
 def open_image_as_NxN_blocks(filename):
     return split_NxN(open_image_as_ndarray(filename))
 
-def split_rgb(blocks):
+def split_channels(blocks):
     red_blocks = blocks[:,:,:,:,0]
     green_blocks = blocks[:,:,:,:,1]
     blue_blocks = blocks[:,:,:,:,2]

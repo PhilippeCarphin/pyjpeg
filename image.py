@@ -9,7 +9,7 @@ def open_image_as_ndarray(filename):
     img = io.imread(filename)
     h = img.shape[0]
     w = img.shape[1]
-    img = img[:h - h % 16, :w - w % 16, :]
+    img = img[:h - h % 32, :w - w % 32, :]
     return img
 
 

@@ -58,5 +58,5 @@ def huffman_decode(bit_list, codebook):
 
     decoded = map(lambda bits : reverse_code[bits], chunk_list)
 
-    return decoded
+    return list(decoded)
 
