@@ -26,6 +26,11 @@ def scheme_subsample(ycbcr_img, scheme):
         Y_img = ycbcr_img[:, :, 0]
         Cb_img = ycbcr_img[::SSH, ::SSW, 1]
         Cr_img = ycbcr_img[::SSH, ::SSW, 2]
+    elif scheme == (4, 1, 1):
+        SSH, SSW = 1, 4
+        Y_img = ycbcr_img[:, :, 0]
+        Cb_img = ycbcr_img[::SSH, ::SSW, 1]
+        Cr_img = ycbcr_img[::SSH, ::SSW, 2]
     else:
         raise NotImplementedError
 
@@ -38,6 +43,11 @@ def upsample_and_assemble(subsampled_object):
         up_Y = subsampled_object['Y']
         up_Cb = upsample(subsampled_object['Cb'], SSH, SSW)
         up_Cr = upsample(subsampled_object['Cr'], SSH, SSW)
+    elif subsampled_object['scheme'] == (4, 1, 1):
+        SSH, SSW = 1, 4
+        Y_img = ycbcr_img[:, :, 0]
+        Cb_img = ycbcr_img[::SSH, ::SSW, 1]
+        Cr_img = ycbcr_img[::SSH, ::SSW, 2]
     else:
         raise NotImplementedError
 
