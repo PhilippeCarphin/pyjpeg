@@ -23,16 +23,15 @@ def upsample(arr, up_h, up_w):
 def scheme_subsample(ycbcr_img, scheme):
     if scheme == (4, 2, 0):
         SSH, SSW = 2, 2
-        Y_img = ycbcr_img[:, :, 0]
-        Cb_img = ycbcr_img[::SSH, ::SSW, 1]
-        Cr_img = ycbcr_img[::SSH, ::SSW, 2]
     elif scheme == (4, 1, 1):
         SSH, SSW = 1, 4
-        Y_img = ycbcr_img[:, :, 0]
-        Cb_img = ycbcr_img[::SSH, ::SSW, 1]
-        Cr_img = ycbcr_img[::SSH, ::SSW, 2]
+    elif scheme == (4, 4, 4):
+        SSH, SSW = 1, 1
     else:
         raise NotImplementedError
+    Y_img = ycbcr_img[:, :, 0]
+    Cb_img = ycbcr_img[::SSH, ::SSW, 1]
+    Cr_img = ycbcr_img[::SSH, ::SSW, 2]
 
     return {'Y': Y_img, 'Cb': Cb_img, 'Cr': Cr_img, 'SSH': SSH, 'SSW': SSW, 'scheme': scheme}
 
@@ -40,16 +39,15 @@ def scheme_subsample(ycbcr_img, scheme):
 def upsample_and_assemble(subsampled_object):
     if subsampled_object['scheme'] == (4, 2, 0):
         SSH, SSW = 2, 2
-        up_Y = subsampled_object['Y']
-        up_Cb = upsample(subsampled_object['Cb'], SSH, SSW)
-        up_Cr = upsample(subsampled_object['Cr'], SSH, SSW)
     elif subsampled_object['scheme'] == (4, 1, 1):
         SSH, SSW = 1, 4
-        Y_img = ycbcr_img[:, :, 0]
-        Cb_img = ycbcr_img[::SSH, ::SSW, 1]
-        Cr_img = ycbcr_img[::SSH, ::SSW, 2]
+    elif subsampled_object['scheme'] == (4, 4, 4):
+        SSH, SSW = 1, 1
     else:
         raise NotImplementedError
+    up_Y = subsampled_object['Y']
+    up_Cb = upsample(subsampled_object['Cb'], SSH, SSW)
+    up_Cr = upsample(subsampled_object['Cr'], SSH, SSW)
 
     assembled_array = np.zeros((up_Y.shape) + (3,))
 
