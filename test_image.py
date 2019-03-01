@@ -1,6 +1,7 @@
 import unittest
 import image
 
+
 class TestImage(unittest.TestCase):
 
     def test_image(self):

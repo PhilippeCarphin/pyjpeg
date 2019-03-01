@@ -1,6 +1,8 @@
 import dct
 import matplotlib.pyplot as plt
+import numpy as np
 import blocks
+
 
 def demo():
     the_blocks = blocks.get_test_image_as_NxN_blocks()

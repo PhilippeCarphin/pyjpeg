@@ -1,12 +1,12 @@
-import image
-import matplotlib.pyplot as plt
 import numpy as np
 
 
-# Encoding and decoding foud on stack overflow
-# Ref : https://stackoverflow.com/a/34913974/5795941
 def rgb2ycbcr(im):
-    """ Phil notes: Each rgb which is a im[i,j,:] so a vector that goes
+    """
+    Encoding and decoding foud on stack overflow
+    Ref : https://stackoverflow.com/a/34913974/5795941
+
+    Phil notes: Each rgb which is a im[i,j,:] so a vector that goes
     inside the page if your rgb block is a stack of three 2D arrays
     That vector gets multiplied by the matrix, M given below, and the result
     becomes ycbcr[i,j,:] he does the same thing for the inverse function

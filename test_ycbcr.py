@@ -2,6 +2,7 @@ import unittest
 import image
 import ycbcr
 
+
 class TestYCbCr(unittest.TestCase):
 
     def test_stuff(self):
@@ -15,7 +16,6 @@ class TestYCbCr(unittest.TestCase):
         # plt.imshow(img_back)
         # plt.title("Image encodée et décodée")
         # plt.show()
-
 
         # Y = ycbcr_img[:, :, 0]
         # CB = ycbcr_img[:, :, 1]

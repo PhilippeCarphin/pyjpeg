@@ -1,6 +1,5 @@
 import huffman
-import zigzag
-import numpy as np
+
 
 def get_frequencies(big_line):
     frequencies = {}
@@ -9,6 +8,7 @@ def get_frequencies(big_line):
             frequencies[symbol] = 1
         frequencies[symbol] += 1
     return frequencies.items()
+
 
 def get_huffman_codebook(big_line):
     freqs = get_frequencies(big_line)
@@ -21,7 +21,8 @@ def huffman_encode(big_line):
     h_line = []
     for s in big_line:
         h_line += [b for b in huff_code[s]]
-    return { 'data': h_line, 'codebook': huff_code}
+    return {'data': h_line, 'codebook': huff_code}
+
 
 def huffman_decode(bit_list, codebook):
     reverse_code = {codebook[symbol]: symbol for symbol in codebook}
@@ -37,7 +38,6 @@ def huffman_decode(bit_list, codebook):
     except StopIteration:
         pass
 
-    decoded = map(lambda bits : reverse_code[bits], chunk_list)
+    decoded = map(lambda bits: reverse_code[bits], chunk_list)
 
     return list(decoded)
-

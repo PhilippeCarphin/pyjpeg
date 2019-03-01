@@ -14,7 +14,8 @@ def open_image_as_ndarray(filename):
 
 
 def get_test_image():
-    # RECAP : Opening the image and splitting it into blocks
+    """RECAP : Opening the image and splitting it into blocks
+    """
     img = io.imread('input_image.png')
     h = img.shape[0]
     w = img.shape[1]

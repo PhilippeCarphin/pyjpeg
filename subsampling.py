@@ -21,19 +21,19 @@ def upsample(arr, up_h, up_w):
 
 
 def scheme_subsample(ycbcr_img, scheme):
-
-    if scheme == (4,2,0):
+    if scheme == (4, 2, 0):
         SSH, SSW = 2, 2
-        Y_img = ycbcr_img[:,:,0]
-        Cb_img = ycbcr_img[::SSH,::SSW,1]
-        Cr_img = ycbcr_img[::SSH,::SSW,2]
+        Y_img = ycbcr_img[:, :, 0]
+        Cb_img = ycbcr_img[::SSH, ::SSW, 1]
+        Cr_img = ycbcr_img[::SSH, ::SSW, 2]
     else:
         raise NotImplementedError
 
-    return { 'Y': Y_img, 'Cb': Cb_img, 'Cr': Cr_img, 'SSH': SSH, 'SSW':SSW, 'scheme': scheme}
+    return {'Y': Y_img, 'Cb': Cb_img, 'Cr': Cr_img, 'SSH': SSH, 'SSW': SSW, 'scheme': scheme}
+
 
 def upsample_and_assemble(subsampled_object):
-    if subsampled_object['scheme'] == (4,2,0):
+    if subsampled_object['scheme'] == (4, 2, 0):
         SSH, SSW = 2, 2
         up_Y = subsampled_object['Y']
         up_Cb = upsample(subsampled_object['Cb'], SSH, SSW)
@@ -48,6 +48,7 @@ def upsample_and_assemble(subsampled_object):
     assembled_array[:, :, 2] = up_Cr[:, :]
 
     return assembled_array
+
 
 def subsample(arr, SSH, SSW):
     return arr[::SSH, ::SSW]

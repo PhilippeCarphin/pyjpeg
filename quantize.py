@@ -1,7 +1,7 @@
 import numpy as np
 import dct
 
-Quant1= np.matrix( ' 1  1 10 16  24  40  51  61;\
+Quant1 = np.matrix(' 1  1 10 16  24  40  51  61;\
                      1 12 14 19  26  58  60  55;\
                     14 13 16 24  40  57  69  56;\
                     14 17 22 29  51  87  80  62;\
@@ -9,7 +9,7 @@ Quant1= np.matrix( ' 1  1 10 16  24  40  51  61;\
                     24 35 55 64  81 104 103  92;\
                     49 64 78 77 103 121 120 101;\
                     72 92 95 98 112 100 103  99').astype('uint8')
-Quant2= np.matrix( ' 1  1 255 255  255  255  255  255;\
+Quant2 = np.matrix(' 1  1 255 255  255  255  255  255;\
                     1 255 255 255  255  255  60  55;\
                     2551 255 255 255  255  57  69  56;\
                     255 255 255 255  51  87  80  62;\
@@ -18,11 +18,13 @@ Quant2= np.matrix( ' 1  1 255 255  255  255  255  255;\
                     255 255 255 77 103 121 120 101;\
                     255 255 255 98 112 100 103  99').astype('uint8')
 
+
 def quantize_one_block(block, quant=Quant1):
     assert block.shape == quant.shape, f"blocks must have same shape as quant"
     qb = np.empty_like(block)
-    qb[:,:] = np.round(np.divide(block[:,:], quant))
+    qb[:, :] = np.round(np.divide(block[:, :], quant))
     return qb.astype('float')
+
 
 def quantize_blocks(blocks, quant=Quant1):
     assert blocks.shape[2:] == quant.shape, f"blocks must have same shape as quant"
@@ -35,8 +37,9 @@ def quantize_blocks(blocks, quant=Quant1):
     n_blocks_w = blocks.shape[1]
     for i in range(n_blocks_h):
         for j in range(n_blocks_w):
-            qb[i,j,:,:] = np.round(np.divide(blocks[i,j,:,:], quant))
+            qb[i, j, :, :] = np.round(np.divide(blocks[i, j, :, :], quant))
     return qb.astype('float')
+
 
 if __name__ == "__main__":
     pass

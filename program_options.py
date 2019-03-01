@@ -1,6 +1,7 @@
 import argparse
 import json
 
+
 def load_config_file(filename):
     try:
         with open(filename) as f:
@@ -18,9 +19,10 @@ def command_line_parser():
     p.add_argument("-c", "--create-config-file", help='create a config file with for this program')
     return p
 
+
 def create_config_file(program_options):
     """ I could probably use the parser to construct this
-    dictionnaryj """
+    dictionnary """
     config = {
         'verbose': True,
         'input': './input_image.png',
@@ -31,8 +33,8 @@ def create_config_file(program_options):
     with open(filename, 'w+') as f:
         f.write(json.dumps(config, indent=4, sort_keys=True))
 
-def post_parsing(options):
 
+def post_parsing(options):
     # if no input, use our test image
 
     # Ex: Check if file arguments exist,
@@ -51,6 +53,7 @@ def post_parsing(options):
 
     return options
 
+
 def get_options():
     parsed_options = command_line_parser().parse_args()
 
@@ -62,8 +65,6 @@ def get_options():
 
     return program_options
 
+
 if __name__ == "__main__":
-
-
     get_options()
-

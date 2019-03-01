@@ -13,12 +13,13 @@ import huffman_8770 as huffman
 
 import matplotlib.pyplot as plt
 
+
 class JpegObject():
     def __init__(self, **kwargs):
-        self.use_zigzag=kwargs.get('use_zigzag', True)
-        self.use_dct=kwargs.get('use_dct', True)
+        self.use_zigzag = kwargs.get('use_zigzag', True)
+        self.use_dct = kwargs.get('use_dct', True)
         self.use_subsampling = kwargs.get('use_subsampling', True)
-        self.subsample_scheme = kwargs.get('subsample_scheme', (4,2,0))
+        self.subsample_scheme = kwargs.get('subsample_scheme', (4, 2, 0))
         self.use_dct = True
         self.use_quantize = kwargs.get('use_quantize', True)
         self.use_zigzag = True
@@ -55,9 +56,9 @@ class JpegObject():
         return ycbcr_img
 
     def split_channels(self, ycbcr_blocks):
-        blocks_Y = ycbcr_blocks[:,:,:,:,0]
-        blocks_Cb = ycbcr_blocks[:,:,:,:,1]
-        blocks_Cr = ycbcr_blocks[:,:,:,:,2]
+        blocks_Y = ycbcr_blocks[:, :, :, :, 0]
+        blocks_Cb = ycbcr_blocks[:, :, :, :, 1]
+        blocks_Cr = ycbcr_blocks[:, :, :, :, 2]
         self.blocks_shape = blocks_Y.shape
         self.CbCr_shape = blocks_Cb.shape
         return (blocks_Y, blocks_Cb, blocks_Cr)
@@ -67,9 +68,9 @@ class JpegObject():
         # while split channels takes things in block form
         Y_channel, Cb_channel, Cr_channel = channels_data
         ycbcr_img = np.zeros(Y_channel.shape + (3,))
-        ycbcr_img[:,:,0] = Y_channel
-        ycbcr_img[:,:,1] = Cb_channel
-        ycbcr_img[:,:,2] = Cr_channel
+        ycbcr_img[:, :, 0] = Y_channel
+        ycbcr_img[:, :, 1] = Cb_channel
+        ycbcr_img[:, :, 2] = Cr_channel
         return ycbcr_img
 
     def do_combine_blocks(self, blocks_data):
@@ -143,7 +144,7 @@ class JpegObject():
         rgb_img = image.open_image_as_ndarray(filename)
         ycbcr_img = ycbcr.rgb2ycbcr(rgb_img)
         ycbcr_blocks = blocks.split_NxN(ycbcr_img)
-        self.blocks_shape = ycbcr_blocks[:,:,:,:,0].shape
+        self.blocks_shape = ycbcr_blocks[:, :, :, :, 0].shape
 
         if self.use_subsampling:
             ycbcr_data = self.get_subsampled_blocks(ycbcr_img)
@@ -159,7 +160,7 @@ class JpegObject():
         if self.use_huffman:
             huffman_data = self.do_huffman(zigzag_data)
 
-################# BEGIN DECODE #################################################
+        ################# BEGIN DECODE #################################################
 
         if self.use_huffman:
             zigzag_data = self.undo_huffman(huffman_data)
@@ -190,6 +191,7 @@ class JpegObject():
 
         return rgb_img
 
+
 if __name__ == "__main__":
     pass
     jpegobj = JpegObject(
@@ -200,18 +202,6 @@ if __name__ == "__main__":
     )
     encoded_decoded = jpegobj.encode_decode('input_image.png')
     print(jpegobj.zigzag_length)
-    print(jpegobj.huffman_size//8) # parce que huffman_size est la lognueur d'une liste de bits
+    print(jpegobj.huffman_size // 8)  # parce que huffman_size est la longeur d'une liste de bits
     plt.imshow(encoded_decoded)
     plt.show()
-
-
-
-
-
-
-
-
-
-
-
-

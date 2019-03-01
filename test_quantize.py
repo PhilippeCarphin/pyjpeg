@@ -2,6 +2,7 @@ import unittest
 import quantize
 import blocks
 
+
 class TestQuantize(unittest.TestCase):
 
     def test_quantize(self):
@@ -10,7 +11,7 @@ class TestQuantize(unittest.TestCase):
 
         img = blocks.get_test_image_as_NxN_blocks()
         img = blocks.open_image_as_NxN_blocks('input_image.png')
-        quantize.quantize_blocks(img[:,:,:,:,0])
+        quantize.quantize_blocks(img[:, :, :, :, 0])
     # print(f"quantized_block : {quantized_block}")
 
     # ################################### APPLY TO YCBCR
@@ -45,4 +46,3 @@ class TestQuantize(unittest.TestCase):
     # plt.imshow(decoded_block, cmap=plt.get_cmap('gray_r'))
     # plt.title("BlocCB > DCT > Quantification > IDCT")
     # plt.show()
-

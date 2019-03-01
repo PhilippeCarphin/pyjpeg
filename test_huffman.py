@@ -4,6 +4,7 @@ import numpy as np
 import blocks
 import zigzag
 
+
 class TestHuffman(unittest.TestCase):
 
     def setUp(self):
