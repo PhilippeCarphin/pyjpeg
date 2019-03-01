@@ -211,3 +211,26 @@ if __name__ == "__main__":
     print(jpegobj.huffman_size // 8)  # parce que huffman_size est la longeur d'une liste de bits
     plt.imshow(encoded_decoded)
     plt.show()
+
+
+    # TODO Refaire la meme chose pour plein d'images,
+
+    # - varier le subsampling
+    # - varier la matrice de quant
+
+    # Prendre en note les tailles intiales et compressées
+    # Les tailles se retrouvent dans jpegobj.zigzag_length et huffman_size
+    # qui sont calculés durant la compression dans PyJpeg.encode_decode
+
+    # Prendre en note une évaluation subjective de la dégradation
+
+
+    # TODO Refaire aussi pour une (ou deux si le temps le permet):
+
+    #      Paser l'image plusierus fois dans la compression
+    #          - prendre en notes les dimensions initiales
+    #          - prendre en note le huffman_size final
+    #          - Évaluer subjectivement la dégradation et dire si ça empire de fois en foi. (moi je pense que ça empirera pas trop de fois en fois)
+
+    # TODO Lire l'énoncé, ils demandent une image faite en utilisant la même matrice à chaque fois (ça je crois que le faire plusieurs fois ne dégradera pas plus ou beaucoup plus que le faire une fois), et avec différentes quant, là on verra
+
