@@ -1,0 +1,48 @@
+* Setup
+
+#+BEGIN_SRC sh
+python3 -m pip install -r requirements.txt
+#+END_SRC
+
+or
+
+#+BEGIN_SRC sh
+virtualenv -p python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
+#+END_SRC
+
+* Usage
+
+Edit =pyjpeg.py= here:
+
+#+BEGIN_SRC python
+def generate_images():
+    images = [
+        'input_image.png',
+    ]
+    quants = [
+        quantize.Quant1,
+        quantize.Quant2,
+        quantize.QuantAgressive,
+        quantize.QuantSuperAgressive
+    ]
+    subsampling_schemes = [
+        (4,4,4),
+        (4,2,0),
+        (4,1,1)
+    ]
+    for quant, subsampling_scheme, img_file in itertools.product(quants, subsampling_schemes, images):
+        # ...
+#+END_SRC
+
+then run
+
+#+BEGIN_SRC sh
+python3 pyjpeg.py
+#+END_SRC
+
+* Demo
+
+The file =demo.py= also has a nice demo that shows a couple of informative
+images giving insight into the DCT process.

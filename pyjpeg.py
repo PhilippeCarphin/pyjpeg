@@ -212,7 +212,6 @@ def quant_str(q):
 def generate_images():
     images = [
         'input_image.png',
-        # 'images/asdf', #ADAM ICI!!
     ]
     quants = [
         quantize.Quant1,
